@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <description>spring 整合数据库连接池</description>
+
+    <!--引入db的配置文件-->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!--基本属性-->
+        <property name="driver" value="${db.default.driver}"/>
+        <property name="url" value="${db.default.url}"/>
+        <property name="username" value="${db.default.username}"/>
+        <property name="password" value="${db.default.password}"/>
+        <!--test-->
+        <property name="validationQuery" value="${db.default.validationQuery}"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <!--连接池大小-->
+        <property name="initialSize" value="1"/>
+        <property name="minIdle" value="1"/>
+        <property name="maxActive" value="5"/>
+        <!--配置获取连接的等待时间-->
+        <property name="maxWait" value="60000"/>
+        <!--配置多久进行一次检测需要关闭的空闲连接，单位为毫秒-->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!--配置一个连接在池中生存的时间-->
+        <property name="minEvictableIdleTimeMillis" value="30000"/>
+        <!-- 配置监控统计拦截的fileter， 去掉后监控界面sql无法统计-->
+        <property name="filters" value="stat"/>
+    </bean>
+
+    <!--事务管理-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--本地事务传播模板-->
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+
+</beans>
